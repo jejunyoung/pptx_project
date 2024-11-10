@@ -8,18 +8,22 @@ const HomePage: React.FC = () => {
   const [inputText, setInputText] = useState("");
   const [extraText, setExtraText] = useState<string[]>([]);
 
-  const onApplyInput = () => {
+  const onApplyInput = async () => {
     const verses = inputText.split(/\r?\n/);
     const results: string[] = [];
 
-    verses.forEach((verse) => {
-      handleInputChange(verse, setInputText, (extra) => {
-        if (typeof extra === "string" && extra !== "") {
-          results.push(extra);
-        }
-      });
-    });
+    // 모든 구절에 대해 비동기 처리 후 결과를 기다림
+    await Promise.all(
+      verses.map(async (verse) => {
+        await handleInputChange(verse, setInputText, (extra) => {
+          if (typeof extra === "string" && extra !== "") {
+            results.push(extra);
+          }
+        });
+      })
+    );
 
+    // 모든 비동기 처리가 끝난 후에 상태 업데이트
     setExtraText(results);
   };
 
